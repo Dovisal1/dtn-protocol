@@ -3,12 +3,14 @@
 import os
 import socket
 import json
+import datetime
 
 def mk_packet(src, intm, dest, payload):
 	packet = {}
 	packet["src"] = src
 	packet["int"] = intm
 	packet["dest"] = dest
+	packet["time"] = datetime.datetime.now()
 	packet["payload"] = payload
 	return json.dumps(packet)
 
@@ -30,6 +32,11 @@ def mk_path(dest, intms):
 				path.append(host)
 				break
 	return path
+
+def 
+
+def main():
+
 
 
 
