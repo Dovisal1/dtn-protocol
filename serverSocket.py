@@ -15,9 +15,6 @@ def initializeServer(port):
 	while True :
 		c, addr = s.accept();
 		print 'Got connection from ' , addr;
-		c.send("ACK");
-		c.close();
-	return hostname;
 
 
 def main():
