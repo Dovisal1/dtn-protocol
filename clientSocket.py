@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
-import socket;
-import 
+import os
+import socket
+import json
 
 def mk_packet(src, intm, dest, payload):
 	packet = {}
@@ -11,8 +12,19 @@ def mk_packet(src, intm, dest, payload):
 	packet["payload"] = payload
 	return json.dumps(packet)
 
+def send_packet(packet)
+	client = socket.socket()
+	c.connect((packet["dest"], port))
+	c.send(mk_packet(packet))
 
 
-def _init_:
-	s - socket.socket();
-	host = s.hostname();
+def ping(host):
+	status = os.system("ping -c3 -t1 " + host)
+	return status == 0
+
+
+
+
+
+
+
