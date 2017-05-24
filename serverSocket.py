@@ -2,7 +2,8 @@
 
 #Server Socket
 import socket
-#import clientSocket.py
+import thread
+import clientSocket.py
 
 
 #server is listening
@@ -14,24 +15,35 @@ def initializeServer(port):
 	s.listen(5);
 	while True :
 		c, addr = s.accept();
+		spawn_thread(c,addr)
+
 		print 'Got connection from ' , addr;
 
+def handle_connection(connection,address):
+	thread = threading.Thread(target = handle_req())
 
-def main():
 
-	print "Waiting For Client";
-	hostname = initializeServer(8080);
-	packetReceived = s.recieve(1024);
-	print packetReceived;
-	if(packetReceived["intm"] == None):
-		#mk_packet("", 0, "", "");
-		print "Empty packet Recieved";
-	else:
-		print "delivered";
-	print hostname;
+def receive_connection(connection,address):
+	packet = connection.recv();
+	packetDict = json.loads(packet);
+	src = packetDict["src"]
+	dest = packetDict["dest"]
+	seq = packetDict["seq"]
+	payload = packetDict["payload"]
+	if packetDict["intm"]:
+		handle_req(src, [], dest, seq, payload)
+
+
+def spawn_thread(connection,address):
+	thread = threading.Thread(target = receive_connection, args = (connection,address))
+	thread.daemon = True;
+	thread.start();
+
+
+PORT = 8080
 
 if __name__ == "__main__":
-	main();
+	initializeServer(PORT)
 
 
 
