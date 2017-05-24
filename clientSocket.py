@@ -22,6 +22,14 @@ def ping(host):
 	status = os.system("ping -c3 -t1 " + host)
 	return status == 0
 
+def mk_path(dest, intms):
+	path = [dest]
+	if not ping(dest):
+		for host in intms:
+			if ping(host):
+				path.append(host)
+				break
+	return path
 
 
 
