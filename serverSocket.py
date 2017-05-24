@@ -3,10 +3,9 @@
 #Server Socket
 import socket
 
-def _init_:
+def initialize(port):
 	s = socket.socket();
 	hostname = s.gethostname();
-	port = 8080;
 	s.bind(hostname,port);
 	s.listen(5);
 	while True :
@@ -14,7 +13,4 @@ def _init_:
 		print 'Got connection from ' , addr;
 		c.send("ACK");
 		c.close();
-
-
-
-
+	return hostname;
