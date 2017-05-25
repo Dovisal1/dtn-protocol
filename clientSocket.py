@@ -127,7 +127,7 @@ def main(dest):
 	seq = 1
 	src = socket.gethostname()
 	while True:
-		with Client(src, INTM, seq, DEST, rand_str(64)) as c
+		with Client(src, INTM, seq, DEST, rand_str(64)) as c:
 			c.run()
 		seq += 1
 		log("seq: %d" % seq, debug)

@@ -39,7 +39,7 @@ def receive_connection(conn, addr):
 	if packet_dict["intm"]:
 		intms = clientSocket.INTMS
 		intms.remove(intm)
-		with clientSocket.Client(src, intms, seq, dest, payload) as c
+		with clientSocket.Client(src, intms, seq, dest, payload) as c:
 			c.run()
 
 	conn.close()
