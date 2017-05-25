@@ -34,7 +34,6 @@ class Client:
 		}
 		self.dest = dest
 		self.intm = intm
-		self.client = client
 
 	def __enter__(self):
 		return self
