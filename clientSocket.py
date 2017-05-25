@@ -51,8 +51,7 @@ class Client:
 		except socket.error:
 			self.client.connect((self.intm, PORT))
 		else:
-			#packet is droped
-			self.client.close()
+			raise socket.error
 		finally:
 			self.packet["intm"] = self.intm
 
@@ -61,11 +60,15 @@ class Client:
 		self.client.send(self.packetstr())
 
 	def run():
-		self.establish_conn()
-		if self.client.fileno()
+		try:
+			self.establish_conn()
 			self.send_packet()
+		except socket.error:
+			# log error, pass for now
+			pass		
 
 	def __exit__(self, exc_type, exc_value, traceback):
+		self.client.shutdown()
 		self.client.close()
 
 
