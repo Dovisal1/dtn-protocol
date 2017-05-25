@@ -53,7 +53,6 @@ class Client:
 		except socket.error:
 			self.client.connect((self.intm, PORT))
 		else:
-			self.client.shutdown()
 			self.client.close()
 			self.client = None
 		finally:
@@ -70,7 +69,7 @@ class Client:
 
 	def __exit__(self, exc_type, exc_value, traceback):
 		if self.client:
-			self.client.shutdown()
+			self.client.shutdown(1)
 			self.client.close()
 
 
