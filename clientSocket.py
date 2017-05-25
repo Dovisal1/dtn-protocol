@@ -48,7 +48,7 @@ class Client:
 		self.client.settimeout(0.1)
 
 		try:
-			self.client.connect((dest, PORT))
+			self.client.connect((self.dest, PORT))
 			self.intm = None
 		except socket.error:
 			self.client.connect((self.intm, PORT))
