@@ -17,43 +17,56 @@ def log(msg, console=False):
 	if console:
 		print(msg)
 
-class Request:
-	def __init__(self, src, intms, seq, dest, payload, client=None):
+def ping(host):
+	status = os.system("ping -c1 -w1 " + host)
+	return status == 0
+
+class Client:
+	def __init__(self, src, intm, seq, dest, payload):
 		self.packet = {
 			"src": 		src,
 			"dest":		dest,
-			"time":		time.time()
-			"seq":		seq
+			"time":		time.time(),
+			"seq":		seq,
 			"payload":	payload
 		}
 		self.dest = dest
-		self.intms = intms
-		self.c = client
+		self.intm = intm
+		self.client = client
+
+	def __enter__(self):
+		return self
 
 	def packetstr(self):
-		return json.dumps(packet)
+		return json.dumps(self.packet)
 
-	def get_intm(self):
-		self.intm = None
-		if not ping(self.dest):
-			for host in self.intms:
-				if ping(host):
-					self.intm = host
-					break
-		self.packet["intm"] = self.intm
+	def establish_conn(self):
+		self.client = socket.socket()
+
+		self.client.settimeout(0.1)
+
+		try:
+			self.client.connect((dest, PORT))
+			self.intm = None
+		except socket.error:
+			self.client.connect((self.intm, PORT))
+		else:
+			#packet is droped
+			self.client.close()
+		finally:
+			self.packet["intm"] = self.intm
+
 
 	def send_packet(self):
-		if not self.client:
-			self.c = socket.socket()
-			self.c.connect((self.dest,PORT))
-			self.c.send(self.packetstr())
-			self.c.close()
-		else:
-			self.c.send(self.packetstr())
+		self.client.send(self.packetstr())
 
 	def run():
-		self.get_intm()
-		self.send_packet()
+		self.establish_conn()
+		if self.client.fileno()
+			self.send_packet()
+
+	def __exit__(self, exc_type, exc_value, traceback):
+		self.client.close()
 
 
 
@@ -67,7 +80,7 @@ def mk_packet(src, intm, dest, seq, payload):
 	packet["payload"] = payload
 	return json.dumps(packet)
 
-def send_packet(src, intm, dest, seq, payload, c = None)
+def send_packet(src, intm, dest, seq, payload, c = None):
 	if not c:
 		c = socket.socket()
 	c.connect((dest, port))
@@ -96,7 +109,7 @@ def handle_req(src, intms, dest, seq, payload):
 		send_packet(src, intm, dest, seq, payload)
 
 DEST = 'server'
-INTMS = ['intermediary']
+INTM = 'intermediary'
 PORT = 8080
 
 # def main(dest):
@@ -109,15 +122,13 @@ PORT = 8080
 
 def main(dest):
 	seq = 1
-	c = socket.socket()
-	c.connect((DEST,PORT))
 	src = socket.gethostname()
 	while True:
-		r = Request(src, INTMS, seq, DEST, rand_str(64), c)
-		r.run()
+		with Client(src, INTM, seq, DEST, rand_str(64)) as c
+			c.run()
 		seq += 1
 		log("seq: %d" % seq, debug)
-		time.sleep(numpy.random.exponential(2))
+		time.sleep(numpy.random.exponential(3))
 
 
 

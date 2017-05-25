@@ -1,41 +1,52 @@
 #!/usr/bin/python
 
-#Server Socket
+import os
 import socket
 import thread
-import clientSocket.py
+import clientSocket
 
+serverlog = os.join(os.path.expanduser("~"), "server.log")
+logfile = open(serverlog, 'a')
+debug = True
+
+def log(msg)
+	logfile.write(msg)
+	if debug:
+		print(msg)
 
 #server is listening
 def initializeServer(port):
-	s = socket.socket()
+	server = socket.socket()
 	#socket.setblocking(0)
-	hostname = socket.gethostname()
-	s.bind((hostname,port))
-	s.listen(5)
-	while True :
-		c, addr = s.accept()
-		spawn_thread(c,addr)
-
-		print 'Got connection from ' , addr
-
-def handle_connection(connection,address):
-	thread = threading.Thread(target = handle_req())
+	server.bind(('',port))
+	server.listen(5)
+	while True:
+		c, addr = server.accept()
+		spawn_thread(c, addr)
 
 
-def receive_connection(connection,address):
-	packet = connection.recv()
-	packetDict = json.loads(packet)
-	src = packetDict["src"]
-	dest = packetDict["dest"]
-	seq = packetDict["seq"]
-	payload = packetDict["payload"]
-	if packetDict["intm"]:
-		handle_req(src, [], dest, seq, payload)
+def receive_connection(conn, addr):
+	packet = conn.recv(2048)
+	packet_dict = json.loads(packet)
+	src = packet_dict["src"]
+	intm = packet_dict["intm"]
+	dest = packet_dict["dest"]
+	seq = packet_dict["seq"]
+	payload = packet_dict["payload"]
+
+	clog(packet + "\n", debug)
+
+	if packet_dict["intm"]:
+		intms = clientSocket.INTMS
+		intms.remove(intm)
+		with clientSocket.Client(src, intms, seq, dest, payload) as c
+			c.run()
+
+	conn.close()
 
 
-def spawn_thread(connection,address):
-	thread = threading.Thread(target = receive_connection, args = (connection,address))
+def spawn_thread(conn, addr):
+	thread = threading.Thread(target=receive_connection, args=(conn, addr))
 	thread.daemon = True
 	thread.start()
 
