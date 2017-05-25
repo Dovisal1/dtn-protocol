@@ -34,6 +34,7 @@ class Client:
 		}
 		self.dest = dest
 		self.intm = intm
+		self.client = None
 
 	def __enter__(self):
 		return self
@@ -52,7 +53,9 @@ class Client:
 		except socket.error:
 			self.client.connect((self.intm, PORT))
 		else:
-			raise socket.error
+			self.client.shutdown()
+			self.client.close()
+			self.client = None
 		finally:
 			self.packet["intm"] = self.intm
 
@@ -61,16 +64,14 @@ class Client:
 		self.client.send(self.packetstr())
 
 	def run():
-		try:
-			self.establish_conn()
-			self.send_packet()
-		except socket.error:
-			# log error, pass for now
-			pass		
+		self.establish_conn()
+		if self.client:
+			self.send_packet()	
 
 	def __exit__(self, exc_type, exc_value, traceback):
-		self.client.shutdown()
-		self.client.close()
+		if self.client:
+			self.client.shutdown()
+			self.client.close()
 
 
 
