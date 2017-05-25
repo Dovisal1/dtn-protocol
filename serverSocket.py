@@ -12,7 +12,7 @@ serverlog = os.path.join(os.path.expanduser("~"), "server.log")
 logfile = open(serverlog, 'a')
 debug = True
 
-def log(msg,debug=True):
+def log(msg,debug=False):
 	logfile.write(msg)
 	if debug:
 		print(msg)
