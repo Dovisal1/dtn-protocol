@@ -3,13 +3,16 @@
 import os
 import socket
 import thread
+import threading
 import clientSocket
+import json
+
 
 serverlog = os.path.join(os.path.expanduser("~"), "server.log")
 logfile = open(serverlog, 'a')
 debug = True
 
-def log(msg):
+def log(msg,debug=True):
 	logfile.write(msg)
 	if debug:
 		print(msg)
@@ -34,7 +37,7 @@ def receive_connection(conn, addr):
 	seq = packet_dict["seq"]
 	payload = packet_dict["payload"]
 
-	clog(packet + "\n", debug)
+	log(packet + "\n", debug)
 
 	if packet_dict["intm"]:
 		intms = clientSocket.INTMS
