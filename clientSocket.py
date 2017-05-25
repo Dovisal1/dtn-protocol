@@ -7,21 +7,17 @@ import time
 import numpy
 import random
 import string
-
-rand_str = lambda n: ''.join([random.choice(string.lowercase) for i in xrange(n)])
+import logging
 
 clientlog = os.path.join(os.path.expanduser("~"), "client.log")
-logfile = open(clientlog, 'a')
-debug = True
+FORMAT = '[%(levelname)s] (%(threadName)-10s) %(message)s'
+logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 
-def log(msg, console=False):
-	logfile.write(msg)
-	if console:
-		print(msg)
+file_handler = logging.FileHandler(clientlog)
+file_handler.setFormatter(logging.Formatter(FORMAT))
+logging.getLogger().addHandler(file_handler)
 
-def ping(host):
-	status = os.system("ping -c1 -w1 " + host)
-	return status == 0
+rand_str = lambda n: ''.join([random.choice(string.lowercase) for i in xrange(n)])
 
 class Client:
 	def __init__(self, src, intm, seq, dest, payload):
@@ -45,16 +41,17 @@ class Client:
 	def establish_conn(self):
 		self.client = socket.socket()
 
-		self.client.settimeout(0.1)
+		self.client.settimeout(2)
 
 		try:
 			self.client.connect((self.dest, PORT))
 			self.intm = None
 		except socket.error:
-			self.client.connect((self.intm, PORT))
-		else:
-			self.client.close()
-			self.client = None
+			try:
+				self.client.connect((self.intm, PORT))
+			except:
+				self.client.close()
+				self.client = None
 		finally:
 			self.packet["intm"] = self.intm
 
@@ -66,7 +63,7 @@ class Client:
 		self.establish_conn()
 		if self.client:
 			self.send_packet()
-			self.shutdown(1)
+			self.client.shutdown(1)
 
 	def __exit__(self, exc_type, exc_value, traceback):
 		if self.client:
@@ -112,17 +109,9 @@ def handle_req(src, intms, dest, seq, payload):
 		intm = path[1]
 		send_packet(src, intm, dest, seq, payload)
 
-DEST = 'server'
+DEST = 'localhost'
 INTM = 'intermediary'
-PORT = 8080
-
-# def main(dest):
-# 	seq = 1
-# 	c = socket.socket()
-# 	while True:
-# 		handle_req(socket.gethostname(), INTMS, DEST, seq, rand_str(1024))
-# 		seq += 1
-# 		time.sleep(2)
+PORT = 3333
 
 def main(dest):
 	seq = 1
@@ -130,9 +119,9 @@ def main(dest):
 	while True:
 		with Client(src, INTM, seq, DEST, rand_str(64)) as c:
 			c.run()
+		logging.info("seq: %d" % seq)
 		seq += 1
-		log("seq: %d" % seq, debug)
-		time.sleep(numpy.random.exponential(3))
+		time.sleep(numpy.random.exponential(0.08))
 
 
 if __name__ == "__main__":
