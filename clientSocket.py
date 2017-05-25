@@ -65,11 +65,11 @@ class Client:
 	def run(self):
 		self.establish_conn()
 		if self.client:
-			self.send_packet()	
+			self.send_packet()
+			self.shutdown(1)
 
 	def __exit__(self, exc_type, exc_value, traceback):
 		if self.client:
-			self.client.shutdown(1)
 			self.client.close()
 
 
