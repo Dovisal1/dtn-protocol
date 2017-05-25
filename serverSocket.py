@@ -10,7 +10,7 @@ import json
 
 serverlog = os.path.join(os.path.expanduser("~"), "server.log")
 logfile = open(serverlog, 'a')
-debug = True
+debug = False
 
 def log(msg,debug=False):
 	logfile.write(msg)
@@ -21,7 +21,7 @@ def log(msg,debug=False):
 def initializeServer(port):
 	server = socket.socket()
 	#socket.setblocking(0)
-	server.bind(('',port))
+	server.bind((socket.gethostname(),port))
 	server.listen(5)
 	while True:
 		c, addr = server.accept()
@@ -30,20 +30,23 @@ def initializeServer(port):
 
 def receive_connection(conn, addr):
 	packet = conn.recv(2048)
-	packet_dict = json.loads(packet)
-	src = packet_dict["src"]
-	intm = packet_dict["intm"]
-	dest = packet_dict["dest"]
-	seq = packet_dict["seq"]
-	payload = packet_dict["payload"]
+	print "Packet is : " ,packet
 
-	log(packet + "\n", debug)
+	if packet:
+		packet_dict = json.loads(packet)
+		src = packet_dict["src"]
+		intm = packet_dict["intm"]
+		dest = packet_dict["dest"]
+		seq = packet_dict["seq"]
+		payload = packet_dict["payload"]
 
-	if packet_dict["intm"]:
-		intms = clientSocket.INTMS
-		intms.remove(intm)
-		with clientSocket.Client(src, intms, seq, dest, payload) as c:
-			c.run()
+		log(packet + "\n", debug)
+
+		if packet_dict["intm"]:
+			intms = clientSocket.INTMS
+			intms.remove(intm)
+			with clientSocket.Client(src, intms, seq, dest, payload) as c:
+				c.run()
 
 	conn.close()
 
@@ -54,7 +57,7 @@ def spawn_thread(conn, addr):
 	thread.start()
 
 
-PORT = 8080
+PORT = 8081
 
 if __name__ == "__main__":
 	initializeServer(PORT)

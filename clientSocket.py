@@ -12,7 +12,7 @@ rand_str = lambda n: ''.join([random.choice(string.lowercase) for i in xrange(n)
 
 clientlog = os.path.join(os.path.expanduser("~"), "client.log")
 logfile = open(clientlog, 'a')
-debug = True
+debug = False
 
 def log(msg, console=False):
 	logfile.write(msg)
@@ -32,8 +32,8 @@ class Client:
 			"seq":		seq,
 			"payload":	payload
 		}
-		self.dest = dest
-		self.intm = intm
+		self.dest = dest 
+		self.intm = intm 
 		self.client = None
 
 	def __enter__(self):
@@ -48,25 +48,35 @@ class Client:
 		self.client.settimeout(0.1)
 
 		try:
-			self.client.connect((self.dest, PORT))
+			self.client.connect((self.dest + ".dtnslice.ch-geni-net.geni.it.cornell.edu", PORT))
+			print "connected to ", self.dest
 			self.intm = None
+			#time.sleep(0.1)
 		except socket.error:
-			self.client.connect((self.intm, PORT))
+			#print 'Couldnot connect to ', self.dest
+			self.client.connect((self.intm + ".dtnslice.ch-geni-net.geni.it.cornell.edu", PORT))
+
 		else:
 			self.client.close()
 			self.client = None
 		finally:
+
+			#print 'Coming here ', self.packet
 			self.packet["intm"] = self.intm
 
 
 	def send_packet(self):
+		print 'Coming here ' , self.packetstr
 		self.client.send(self.packetstr())
 
 	def run(self):
 		self.establish_conn()
+
 		if self.client:
+			print 'Client is : ' , self.client
 			self.send_packet()
 			self.shutdown(1)
+		
 
 	def __exit__(self, exc_type, exc_value, traceback):
 		if self.client:
@@ -82,6 +92,7 @@ def mk_packet(src, intm, dest, seq, payload):
 	packet["time"] = datetime.datetime.now()
 	packet["seq"] = seq
 	packet["payload"] = payload
+	print 'Packet in client is ' , packet
 	return json.dumps(packet)
 
 def send_packet(src, intm, dest, seq, payload, c = None):
@@ -112,9 +123,9 @@ def handle_req(src, intms, dest, seq, payload):
 		intm = path[1]
 		send_packet(src, intm, dest, seq, payload)
 
-DEST = 'server'
-INTM = 'intermediary'
-PORT = 8080
+DEST = 'Server'
+INTM = 'Intermediary'
+PORT = 8081
 
 # def main(dest):
 # 	seq = 1
