@@ -63,7 +63,7 @@ class Client:
 	def send_packet(self):
 		self.client.send(self.packetstr())
 
-	def run():
+	def run(self):
 		self.establish_conn()
 		if self.client:
 			self.send_packet()	
