@@ -134,5 +134,5 @@ def main(dest):
 		time.sleep(numpy.random.exponential(3))
 
 
-if __name__ = "__main__":
+if __name__ == "__main__":
 	main(DEST)
