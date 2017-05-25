@@ -4,11 +4,13 @@ import os
 import socket
 import json
 import time
+import numpy
 
 rand_str = lambda n: ''.join([random.choice(string.lowercase) for i in xrange(n)])
 
 clientlog = os.path.join(os.path.expanduser("~"), "client.log")
 logfile = open(clientlog, 'a')
+debug = True
 
 def log(msg, console=False):
 	logfile.write(msg)
@@ -114,6 +116,8 @@ def main(dest):
 		r = Request(src, INTMS, seq, DEST, rand_str(64), c)
 		r.run()
 		seq += 1
+		log("seq: %d" % seq, debug)
+		time.sleep(numpy.random.exponential(2))
 
 
 
